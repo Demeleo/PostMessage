@@ -7,54 +7,117 @@
     <script type="text/javascript" src="node_modules/postal/lib/postal.js"></script>
     <script>
 
+        SDK = {
+            topics: {
+                GO_TO_LOBBY: "GO_TO_LOBBY",
+                BALANCE_CHANGED: "BALANCE_CHANGED",
+            },
+            channels: {
+                Inbound: "inbound",
+                Outbound: "outbound"
+            },
+            publishMessage: function(message) {
+                postal.publish({
+                    channel: message.channel,
+                    topic: message.topic,
+                    data: message.body
+                });
+            },
+            processMessage: function(event) {
+
+                var message = event.data;
+                publishMessage({
+                    "channel": this.channels.Inbound,
+                    "topic": message['name'],
+                    "body": message['message']
+                });
+            },
+            initialize: function (configuration) {
+
+                message: {
+                    channel: this.channels.Inbound
+                }
+
+                window.addEventListener("message", this.processMessage(message), false);
+
+            },
+            onGoToLobby: function(callback) {
+                postal.subscribe({
+                    channel: channel.inbound,
+                    topic: topics.GO_TO_LOBBY,
+                    callback: callback
+                });
+            },
+            onBalanceChanged: function (callback) {
+                postal.subscribe({
+                    channel: channel.inbound,
+                    topic: topics.BALANCE_CHANGED,
+                    callback: callback
+                });
+            }
+        }
+
         window.onload = function () {
-            window.addEventListener("message", processMessage, false);
 
-            postal.subscribe({
-                channel: "mychannel",
-                topic: "GET_INFORMATION_RESPONSE",
-                callback: function(data) {
-                    getInformationResponse(data);
-                }
-            });
+            SDK.initialize();
+            SDK.onGoToLobby(goToLobby);
+            SDK.onBalanceChanged(updateBalance);
 
-            postal.subscribe({
-                channel: "mychannel",
-                topic: "IFRAME_PUSH_INFORMATION",
-                callback: function (data) {
-                    displayIFramePushedInfo(data);
-                }
-            }).constraint(function (data) {
-                var messageText = data['message'];
-                return messageText.toLowerCase().indexOf('desmond') === -1;
-            });
+            function goToLobby(options) {
+                
+            }
 
-        };
+            function updateBalance() {
+                
+            }
 
-        function getInformationRequest() {
-            var iframe = document.getElementById("externalWebPage").contentWindow;
-            iframe.postMessage({ "name": "GET_INFORMATION_REQUEST", "message": "get information from iframe request message" }, "http://localhost:52763");
-        }
+        //    window.addEventListener("message", processMessage, false);
+
+        //    postal.subscribe({
+        //        channel: "mychannel",
+        //        topic: "GET_INFORMATION_RESPONSE",
+        //        callback: function(data) {
+        //            getInformationResponse(data);
+        //        }
+        //    });
+
+        //    postal.subscribe({
+        //        channel: "mychannel",
+        //        topic: "IFRAME_PUSH_INFORMATION",
+        //        callback: function (data) {
+        //            displayIFramePushedInfo(data);
+        //        }
+        //    }).constraint(function (data) {
+        //        var messageText = data['message'];
+        //        return messageText.toLowerCase().indexOf('desmond') === -1;
+        //    });
+
+        //};
+
+        //function getInformationRequest() {
+        //    var iframe = document.getElementById("externalWebPage").contentWindow;
+        //    iframe.postMessage({ "name": "GET_INFORMATION_REQUEST", "message": "get information from iframe request message" }, "http://localhost:52763");
+        //}
         
-        function displayIFramePushedInfo(message) {
-            document.getElementById("anotherDiv").innerHTML =
-                "information pushed from iframe " + JSON.stringify(message);
-        }
+        //function displayIFramePushedInfo(message) {
+        //    document.getElementById("anotherDiv").innerHTML =
+        //        "information pushed from iframe " + JSON.stringify(message);
+        //}
 
-        function getInformationResponse(message) {
-            document.getElementById("mainDiv").innerHTML =
-                "information retrieved from iframe " + JSON.stringify(message);
-        }
+        //function getInformationResponse(message) {
+        //    document.getElementById("mainDiv").innerHTML =
+        //        "information retrieved from iframe " + JSON.stringify(message);
+        //}
 
-        function processMessage(event) {
-            var message = event.data;
-            var topicName = message['name'];
-            console.log("message from iframe", message);
-            postal.publish({
-                channel: "mychannel",
-                topic: topicName,
-                data: message
-            });
+        //function processMessage(event) {
+        //    var message = event.data;
+        //    var topicName = message['name'];
+        //    console.log("message from iframe", message);
+        //    postal.publish({
+        //        channel: "mychannel",
+        //        topic: topicName,
+        //        data: message
+        //    });
         }
 
     </script>
