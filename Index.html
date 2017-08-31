@@ -10,7 +10,7 @@
         SDK = {
             topics: {
                 GO_TO_LOBBY: "GO_TO_LOBBY",
-                BALANCE_CHANGED: "BALANCE_CHANGED",
+                BALANCE_CHANGED: "BALANCE_CHANGED"
             },
             channels: {
                 Inbound: "inbound",
@@ -26,32 +26,34 @@
             processMessage: function(event) {
 
                 var message = event.data;
-                publishMessage({
-                    "channel": this.channels.Inbound,
+                this.SDK.publishMessage({
+                    "channel": this.SDK.channels.Inbound,
                     "topic": message['name'],
                     "body": message['message']
                 });
             },
             initialize: function (configuration) {
 
-                message: {
-                    channel: this.channels.Inbound
-                }
+                //message: {
+                //    channel: this.channels.Inbound
+                //};
 
-                window.addEventListener("message", this.processMessage(message), false);
+                window.addEventListener("message", this.processMessage, false);
 
             },
             onGoToLobby: function(callback) {
                 postal.subscribe({
-                    channel: channel.inbound,
-                    topic: topics.GO_TO_LOBBY,
-                    callback: callback
+                    channel: this.channels.Inbound,
+                    topic: this.topics.GO_TO_LOBBY,
+                    callback: function(data) {
+                        callback(data);
+                    }
                 });
             },
             onBalanceChanged: function (callback) {
                 postal.subscribe({
-                    channel: channel.inbound,
-                    topic: topics.BALANCE_CHANGED,
+                    channel: this.channels.Inbound,
+                    topic: this.topics.BALANCE_CHANGED,
                     callback: callback
                 });
             }
@@ -59,12 +61,12 @@
 
         window.onload = function () {
 
-            SDK.initialize();
+            SDK.initialize(null);
             SDK.onGoToLobby(goToLobby);
             SDK.onBalanceChanged(updateBalance);
 
-            function goToLobby(options) {
-                
+            function goToLobby(data) {
+                alert(JSON.stringify(data));
             }
 
             function updateBalance() {

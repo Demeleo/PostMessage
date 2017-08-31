@@ -19,15 +19,16 @@
         }
 
         function pushInformationToParent() {
-            parent.postMessage({ "name": "IFRAME_PUSH_INFORMATION", "message": document.getElementById("txtPushMessage").value }, "http://localhost:52763");
+            parent.postMessage({ "name": "GO_TO_LOBBY", "message": document.getElementById("txtPushMessage").value }, "http://localhost:52763");
         }
+        
 
     </script>
 </head>
 <body>
-<button id="btnSendMessage" onclick="pushInformationToParent();">Push Message</button>
+<button id="btnSendMessage" onclick="pushInformationToParent();">GO TO LOBBY</button>
 <div id="messageDiv">
-    Message must not contain developer name<br>in which case message will not be handled by postaljs<input type="text" id="txtPushMessage" />
+    Message:<input type="text" id="txtPushMessage" />
 </div>
     <div id="mainDiv">
 
