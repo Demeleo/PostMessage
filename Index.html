@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Postal Demo</title>
+
+    <script type="text/javascript" src="node_modules/lodash/lodash.js"></script>
+    <script type="text/javascript" src="node_modules/postal/lib/postal.js"></script>
+
+
+    <script>
+
+        window.onload = function () {
+            window.addEventListener("message", processMessage, false);
+
+            postal.subscribe({
+                channel: "mychannel",
+                topic: "GET_INFORMATION_RESPONSE",
+                callback: function(data) {
+                    getInformationResponse(data);
+                }
+            });
+
+            postal.subscribe({
+                channel: "mychannel",
+                topic: "IFRAME_PUSH_INFORMATION",
+                callback: function (data) {
+                    displayIFramePushedInfo(data);
+                }
+            }).constraint(function (data) {
+                var messageText = data['message'];
+                return messageText.toLowerCase().indexOf('desmond') === -1;
+            });
+
+        };
+
+        function getInformationRequest() {
+            var iframe = document.getElementById("externalWebPage").contentWindow;
+            iframe.postMessage({ "name": "GET_INFORMATION_REQUEST", "message": "get information from iframe request message" }, "http://localhost:52763");
+        }
+        
+        function displayIFramePushedInfo(message) {
+            document.getElementById("anotherDiv").innerHTML =
+                "information pushed from iframe " + JSON.stringify(message);
+        }
+
+        function getInformationResponse(message) {
+            document.getElementById("mainDiv").innerHTML =
+                "information retrieved from iframe " + JSON.stringify(message);
+        }
+
+        function processMessage(event) {
+            var message = event.data;
+            var topicName = message['name'];
+            console.log("message from iframe", message);
+            postal.publish({
+                channel: "mychannel",
+                topic: topicName,
+                data: message
+            });
+        }
+
+    </script>
+</head>
+<body>
+    <button id="btnSendMessage" onclick="getInformationRequest();">Send Message</button>
+    <div id="mainDiv">main page</div>
+    <div id="anotherDiv">main page</div>
+    <iframe id="externalWebPage" name="externalWebPage" src="http://localhost:52763/ExternalWebSite.html"></iframe>
+</body>
+</html>

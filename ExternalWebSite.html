@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    
+    <title>External Web Page</title>
+    <script type="text/javascript" src="node_modules/babel-polyfill/dist/polyfill.js"></script>
+
+    <script type="text/javascript" src="node_modules/lodash/lodash.js"></script>
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="node_modules/postal/lib/postal.js"></script>
+
+
+    <script type="text/javascript" src="node_modules/postal.federation/lib/postal.federation.js"></script>
+    <script type="text/javascript" src="node_modules/postal.xframe/lib/postal.xframe.js"></script>
+    <script>
+        window.onload = function () {
+            window.addEventListener("message", processMessageAndSendResponse, false);
+        };
+
+        function processMessageAndSendResponse(event) {
+            var message = event.data;
+            console.log("data received from parent", message);
+            document.getElementById("mainDiv").innerHTML = JSON.stringify(message);
+            parent.postMessage({ "name": "GET_INFORMATION_RESPONSE", "message": "information from external website"}, "http://localhost:52763");
+        }
+
+        function pushInformationToParent() {
+            parent.postMessage({ "name": "IFRAME_PUSH_INFORMATION", "message": document.getElementById("txtPushMessage").value }, "http://localhost:52763");
+        }
+
+    </script>
+</head>
+<body>
+<button id="btnSendMessage" onclick="pushInformationToParent();">Push Message</button>
+
+<div id="mainDiv">Message must not contain developer name<br>in which case message will not be handled by postaljs<input type="text" id="txtPushMessage" />
+    </div>
+
+
+</body>
+</html>
