@@ -11,7 +11,7 @@
             topics: {
                 GO_TO_LOBBY: "GO_TO_LOBBY",
                 BALANCE_CHANGED: "BALANCE_CHANGED",
-                REQUEST_FROM_IFRAME: "REQUEST_FROM_IFRAME"
+                SEND_MESSAGE_TO_IFRAME: "SEND_MESSAGE_TO_IFRAME"
             },
             channels: {
                 Inbound: "inbound",
@@ -82,7 +82,7 @@
             var iframe = document.getElementById("externalWebPage").contentWindow;
             var message = {
                 "channel": this.SDK.channels.Outbound,
-                "topic": this.SDK.topics.REQUEST_FROM_IFRAME,
+                "topic": this.SDK.topics.SEND_MESSAGE_TO_IFRAME,
                 "body": { "requestid": "myrequestId", "requestInfo": "my request data" }
             };
 
